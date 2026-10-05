@@ -1,0 +1,34 @@
+// ==========================================
+// 1. 通用消息帧 (所有的通信数据都以此结构为最外层包裹)
+// ==========================================
+
+@name(label='Together通用消息帧')
+@protocol
+frame<
+  @name(label='协议魔数，0x5447')
+  magic = 21575: byte(2),
+
+  @name(label='协议版本号')
+  version = 1: byte(1),
+
+  @name(label='消息类型，0x01: Request, 0x02: Response, 0x03: Event')
+  message_type: byte(1),
+  
+  @name(label='发送方接收地址')
+  sender_host: string(16),
+  
+  @name(label='发送方接收端口')
+  sender_port: byte(2),
+  
+  @name(label='消息序号，用于匹配请求与响应')
+  sequence_id: int,
+  
+  @name(label='错误码，成功则为0，错误payload就是错误信息')
+  error = 0: int,
+
+  @name(label='后续载荷的实际长度 (4 Bytes)')
+  payload_len: int,
+
+  @name(label='实际的业务数据（对应下方具体的 Payload 结构序列化后的二进制）')
+  payload: byte(payload_len)
+>
