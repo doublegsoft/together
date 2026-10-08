@@ -24,7 +24,6 @@ elseif (APPLE)
 elseif (UNIX)
   set(PLATFORM                        "linux")
 endif()
-
 set(BUILD                             "build/${PLATFORM}")
 
 ################################################################################
