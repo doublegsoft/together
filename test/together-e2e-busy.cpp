@@ -41,7 +41,7 @@
 void* 
 server_worker(void* arg) 
 {
-  tgr_net_serve(TGR_SERVER_PORT);
+  tgr_net_serve(TGR_SERVER_PORT, NULL, NULL);
   return NULL;
 }
 

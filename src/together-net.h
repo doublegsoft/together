@@ -40,22 +40,39 @@ extern "C"
 #endif
 
 /*!
-** 启动网络服务端监听并运行主服务循环
+** @brief 自定义协议包处理回调函数原型
 **
-** 该函数负责完成服务端的全流程初始化与运行：
-** 1. 创建底层网络套接字；
-** 2. 绑定指定的监听地址与端口；
-** 3. 进入连接监听（listen）并处理接收到的客户端请求与协议数据帧；
-** 4. 阻塞运行，直到服务被主动终止或遭遇致命错误。
+** @param[in]  req       客户端发送的请求帧
+** @param[out] resp      待回复给客户端的响应帧（预设了版本与序列号，可填充 payload 与 error）
+** @param[in]  user_data 用户携带的上下文参数
+** @return 状态码或错误码（如 TGR_OK）
+*/
+typedef int (*tgr_net_handler_cb)(const tgr_frame_p req, tgr_frame_p resp, void* user_data);
+
+/*!
+** @brief 启动 TCP 服务端，监听并基于多路复用与工作线程处理协议请求
 **
-** @param[in] port 本地监听的端口号（范围 1 ~ 65535，传 0 则由操作系统动态分配可用端口）
+** @details 该函数以非阻塞 I/O（poll）多路复用方式监听指定端口：
+**          1. 接受客户端 TCP 连接并自动管理连接生命周期；
+**          2. 接收并解析满足 TGR 协议规范的数据帧；
+**          3. 采用并发控制（Fast-Fail）机制：若当前活动任务数达到 MAX_CONCURRENT_TASKS，
+**             则立即向客户端返回 TGR_ERR_NET_SERVER_BUSY 状态帧；
+**          4. 并发未满时，将请求派发至独立工作线程执行：
+**             - 若指定了 @p handler 回调函数，则由回调完成自定义业务逻辑并填充响应帧；
+**             - 若 @p handler 为 NULL，则降级为默认行为（执行 Shell 命令并将 output.log 作为载荷回传）；
+**          5. 任务处理完毕后自动向客户端发送响应帧并断开连接。
 **
-** @return 执行结果状态码：
-**         - 0: 服务正常终止并退出
-**         - 非0: 发生异常或启动失败（具体对应 TGR_ERR_* 错误码）
+** @param[in] port      服务器监听的本地端口号（1 ~ 65535）
+** @param[in] handler   自定义协议包业务处理回调函数指针。若传入 NULL，则执行默认的 Shell 命令处理器
+** @param[in] user_data 传递给 @p handler 的用户私有上下文指针（可选，可传 NULL）
+**
+** @return int 状态码：
+**         - @c TGR_OK: 服务正常退出
+**         - @c TGR_ERR_NET_SERVER_CREATE: 套接字创建失败
+**         - @c TGR_ERR_NET_SERVER_BIND: 端口绑定失败
 */
 int
-tgr_net_serve(int port);
+tgr_net_serve(int port, tgr_net_handler_cb handler, void* user_data);
 
 /*!
 ** @brief 连接服务器、发送请求数据帧，并同步等待接收服务端的响应数据帧

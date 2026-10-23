@@ -30,5 +30,5 @@
 
 int main(int argc, const char* argv[])
 {
-  tgr_net_serve(5447);
+  tgr_net_serve(5447, NULL, NULL);
 }
