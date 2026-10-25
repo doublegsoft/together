@@ -60,7 +60,7 @@ client_worker(void* arg)
   strcpy(frame->sender_host, "192.168.0.210");
   frame->sender_port = TGR_SERVER_PORT;
   frame->payload_len = strlen(msg);
-  frame->payload = strdup(msg);
+  frame->payload = (uint8_t*) strdup(msg);
 
   tgr_frame_p resp = NULL;
   tgr_net_send("127.0.0.1", TGR_SERVER_PORT, frame, &resp);

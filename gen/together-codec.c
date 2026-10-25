@@ -41,41 +41,37 @@ tgr_frame_decode(const unsigned char* bytes,
   size_t block_bytes = 0;
 
   // magic
-  short raw_magic = 0;
-  memcpy(&raw_magic, bytes + offset, 2);
-  ret->magic = ntohs(raw_magic);
+  memcpy((void*)&ret->magic, bytes + offset, 2);
   offset += 2;
   // version
-  ret->version = bytes[offset];
+  memcpy((void*)&ret->version, bytes + offset, 1);
   offset += 1;
   // message_type
-  ret->message_type = bytes[offset];
+  memcpy((void*)&ret->message_type, bytes + offset, 1);
   offset += 1;
   // sender_host
   memcpy((void*)ret->sender_host, bytes + offset, 16);
   offset += 16;
   // sender_port
-  short raw_sender_port = 0;
-  memcpy(&raw_sender_port, bytes + offset, 2);
-  ret->sender_port = ntohs(raw_sender_port);
+  memcpy((void*)&ret->sender_port, bytes + offset, 2);
   offset += 2;
   // sequence_id
   int raw_sequence_id = 0;
   memcpy(&raw_sequence_id, bytes + offset, 4);
-  ret->sequence_id = ntohl(raw_sequence_id);
+  ret->sequence_id = raw_sequence_id; // ntohl(raw_sequence_id);
   offset += 4;
   // error
   int raw_error = 0;
   memcpy(&raw_error, bytes + offset, 4);
-  ret->error = ntohl(raw_error);
+  ret->error = raw_error; // ntohl(raw_error);
   offset += 4;
   // payload_len
   int raw_payload_len = 0;
   memcpy(&raw_payload_len, bytes + offset, 4);
-  ret->payload_len = ntohl(raw_payload_len);
+  ret->payload_len = raw_payload_len; // ntohl(raw_payload_len);
   offset += 4;
   // payload
-  ret->payload = (char*)malloc(ret->payload_len);  
+  ret->payload = (uint8_t*)malloc(ret->payload_len);  
   memcpy((void*)ret->payload, bytes + offset, ret->payload_len);
   offset += ret->payload_len;
   *size = offset;
@@ -94,8 +90,7 @@ tgr_frame_encode(const tgr_frame_p frame,
   tgr_frame_bytes(frame, &total_bytes);
   *bytes = (unsigned char*)malloc(total_bytes);
   // magic
-  short net_magic = htons(frame->magic);
-  memcpy((*bytes) + offset, &net_magic, 2);
+  memcpy((*bytes) + offset, &frame->magic, 2);
   offset += 2;
   // version
   memcpy((*bytes) + offset, &frame->version, 1);
@@ -107,20 +102,16 @@ tgr_frame_encode(const tgr_frame_p frame,
   memcpy((*bytes) + offset, frame->sender_host, 16);
   offset += 16;
   // sender_port
-  short net_sender_port = htons(frame->sender_port);
-  memcpy((*bytes) + offset, &net_sender_port, 2);
+  memcpy((*bytes) + offset, &frame->sender_port, 2);
   offset += 2;
   // sequence_id
-  int net_sequence_id = htonl(frame->sequence_id);
-  memcpy((*bytes) + offset, &net_sequence_id, 4);
+  memcpy((*bytes) + offset, &frame->sequence_id, 4);
   offset += 4;
   // error
-  int net_error = htonl(frame->error);
-  memcpy((*bytes) + offset, &net_error, 4);
+  memcpy((*bytes) + offset, &frame->error, 4);
   offset += 4;
   // payload_len
-  int net_payload_len = htonl(frame->payload_len);
-  memcpy((*bytes) + offset, &net_payload_len, 4);
+  memcpy((*bytes) + offset, &frame->payload_len, 4);
   offset += 4;
   // payload
   memcpy((*bytes) + offset, frame->payload, frame->payload_len);
@@ -151,6 +142,6 @@ tgr_frame_bytes(const tgr_frame_p obj,
   // payload_len    
   total_bytes += 4; 
   // payload    
-  total_bytes += obj->payload_len; 
+  total_bytes += obj->payload_len;
   *size = total_bytes;
 }

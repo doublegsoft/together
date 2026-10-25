@@ -30,6 +30,8 @@
 #ifndef __TOGETHER_POCO_H__
 #define __TOGETHER_POCO_H__
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -54,17 +56,17 @@ struct tgr_frame_s
   /*!
   ** 【协议魔数，0x5447】
   */
-  short magic;
+  uint16_t magic;
 
   /*!
   ** 【协议版本号】
   */
-  char version;
+  uint8_t version;
 
   /*!
   ** 【消息类型，0x01: Request, 0x02: Response, 0x03: Event】
   */
-  char message_type;
+  uint8_t message_type;
 
   /*!
   ** 【发送方接收地址】
@@ -74,7 +76,7 @@ struct tgr_frame_s
   /*!
   ** 【发送方接收端口】
   */
-  short sender_port;
+  uint16_t sender_port;
 
   /*!
   ** 【消息序号，用于匹配请求与响应】
@@ -94,7 +96,7 @@ struct tgr_frame_s
   /*!
   ** 【实际的业务数据（对应下方具体的 Payload 结构序列化后的二进制）】
   */
-  char* payload;  
+  uint8_t* payload;  
 }; 
 
 /*!
@@ -113,19 +115,19 @@ tgr_frame_free(tgr_frame_p);
 ** 设置【Together通用消息帧】的【协议魔数，0x5447】属性值。
 */
 void
-tgr_frame_set_magic(tgr_frame_p, short);
+tgr_frame_set_magic(tgr_frame_p, uint16_t);
 
 /*!
 ** 设置【Together通用消息帧】的【协议版本号】属性值。
 */
 void
-tgr_frame_set_version(tgr_frame_p, char);
+tgr_frame_set_version(tgr_frame_p, uint8_t);
 
 /*!
 ** 设置【Together通用消息帧】的【消息类型，0x01: Request, 0x02: Response, 0x03: Event】属性值。
 */
 void
-tgr_frame_set_message_type(tgr_frame_p, char);
+tgr_frame_set_message_type(tgr_frame_p, uint8_t);
 
 /*!
 ** 设置【Together通用消息帧】的【发送方接收地址】属性值。
@@ -137,7 +139,7 @@ tgr_frame_set_sender_host(tgr_frame_p, char*);
 ** 设置【Together通用消息帧】的【发送方接收端口】属性值。
 */
 void
-tgr_frame_set_sender_port(tgr_frame_p, short);
+tgr_frame_set_sender_port(tgr_frame_p, uint16_t);
 
 /*!
 ** 设置【Together通用消息帧】的【消息序号，用于匹配请求与响应】属性值。
@@ -161,7 +163,7 @@ tgr_frame_set_payload_len(tgr_frame_p, int);
 ** 设置【Together通用消息帧】的【实际的业务数据（对应下方具体的 Payload 结构序列化后的二进制）】属性值。
 */
 void
-tgr_frame_set_payload(tgr_frame_p, char*);
+tgr_frame_set_payload(tgr_frame_p, uint8_t*);
 
 #ifdef __cplusplus
 }

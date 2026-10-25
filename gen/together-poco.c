@@ -38,13 +38,10 @@ tgr_frame_init(void)
 {
   tgr_frame_p ret = (tgr_frame_p) malloc(sizeof(tgr_frame_t));
   strcpy(ret->type_name, "tgr_frame_p");
-  ret->version = '\0';
-  ret->message_type = '\0';
   ret->sender_host[0] = '\0';
   ret->sequence_id = INT_MIN;
   ret->error = INT_MIN;
   ret->payload_len = INT_MIN;
-  ret->payload = NULL;
   return ret;
 }
 
@@ -57,19 +54,19 @@ tgr_frame_free(tgr_frame_p frame)
 }
 
 void
-tgr_frame_set_magic(tgr_frame_p frame, short value)
+tgr_frame_set_magic(tgr_frame_p frame, uint16_t value)
 {
   frame->magic = value;
 }
 
 void
-tgr_frame_set_version(tgr_frame_p frame, char value)
+tgr_frame_set_version(tgr_frame_p frame, uint8_t value)
 {
   frame->version = value;
 }
 
 void
-tgr_frame_set_message_type(tgr_frame_p frame, char value)
+tgr_frame_set_message_type(tgr_frame_p frame, uint8_t value)
 {
   frame->message_type = value;
 }
@@ -84,7 +81,7 @@ tgr_frame_set_sender_host(tgr_frame_p frame, char* value)
 }
 
 void
-tgr_frame_set_sender_port(tgr_frame_p frame, short value)
+tgr_frame_set_sender_port(tgr_frame_p frame, uint16_t value)
 {
   frame->sender_port = value;
 }
@@ -108,7 +105,7 @@ tgr_frame_set_payload_len(tgr_frame_p frame, int value)
 }
 
 void
-tgr_frame_set_payload(tgr_frame_p frame, char* value)
+tgr_frame_set_payload(tgr_frame_p frame, uint8_t* value)
 {
   frame->payload = value;
 }

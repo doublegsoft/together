@@ -52,7 +52,7 @@ TEST(codec, encode_decode_request) {
   strcpy(frame->sender_host, "192.168.0.210");
   frame->sender_port = TGR_SERVER_PORT;
   frame->payload_len = strlen(msg);
-  frame->payload = strdup(msg);
+  frame->payload = (uint8_t*) strdup(msg);
 
   tgr_frame_encode(frame, &bytes, &frame_size);
   tgr_frame_free(frame);
@@ -69,7 +69,7 @@ TEST(codec, encode_decode_request) {
   ASSERT_STREQ("192.168.0.210", frame->sender_host);
   ASSERT_EQ(TGR_SERVER_PORT, frame->sender_port);
   ASSERT_EQ(strlen(msg), frame->payload_len);
-  ASSERT_STREQ(msg, frame->payload);
+  ASSERT_STREQ(msg, (char*)frame->payload);
 
   free(bytes);
   tgr_frame_free(frame);
@@ -91,7 +91,7 @@ TEST(codec, encode_decode_response) {
   strcpy(frame->sender_host, "192.168.0.210");
   frame->sender_port = TGR_SERVER_PORT;
   frame->payload_len = strlen(msg);
-  frame->payload = strdup(msg);
+  frame->payload = (uint8_t*) strdup(msg);
 
   tgr_frame_encode(frame, &bytes, &frame_size);
   tgr_frame_free(frame);
@@ -108,7 +108,7 @@ TEST(codec, encode_decode_response) {
   ASSERT_STREQ("192.168.0.210", frame->sender_host);
   ASSERT_EQ(TGR_SERVER_PORT, frame->sender_port);
   ASSERT_EQ(strlen(msg), frame->payload_len);
-  ASSERT_STREQ(msg, frame->payload);
+  ASSERT_STREQ(msg, (char*) frame->payload);
 
   free(bytes);
   tgr_frame_free(frame);
@@ -131,7 +131,7 @@ TEST(codec, encode_decode_response_with_error) {
   strcpy(frame->sender_host, "192.168.0.210");
   frame->sender_port = TGR_SERVER_PORT;
   frame->payload_len = strlen(msg);
-  frame->payload = strdup(msg);
+  frame->payload = (uint8_t*) strdup(msg);
 
   tgr_frame_encode(frame, &bytes, &frame_size);
   tgr_frame_free(frame);
@@ -148,9 +148,9 @@ TEST(codec, encode_decode_response_with_error) {
   ASSERT_STREQ("192.168.0.210", frame->sender_host);
   ASSERT_EQ(TGR_SERVER_PORT, frame->sender_port);
   ASSERT_EQ(strlen(msg), frame->payload_len);
-  ASSERT_STREQ(msg, frame->payload);
+  ASSERT_STREQ(msg, (char*) frame->payload);
 
-  printf("error message: %.*s\n", (int) frame->payload_len, frame->payload);
+  printf("error message: %.*s\n", (int) frame->payload_len, (char*) frame->payload);
   free(bytes);
   tgr_frame_free(frame);
 }
