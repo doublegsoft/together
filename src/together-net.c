@@ -30,7 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#define _POSIX_C_SOURCE 200809L
 #include <time.h>
+#include <sys/time.h>
 #include <pthread.h>
 #include <stdatomic.h>
 
