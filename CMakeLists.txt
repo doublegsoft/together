@@ -78,6 +78,9 @@ link_directories(
 add_library(together STATIC
   ${TOGETHER_SOURCES}
 )
+target_compile_definitions(together PRIVATE
+  _POSIX_C_SOURCE=200809L
+)
 
 add_executable(together-server
   ${TOGETHER_SOURCES}

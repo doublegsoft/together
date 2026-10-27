@@ -30,7 +30,6 @@
 #ifndef __TOGETHER_NET_H__
 #define __TOGETHER_NET_H__
 
-#define _POSIX_C_SOURCE 199309L
 #include <stddef.h>
 
 #include "together-poco.h"
