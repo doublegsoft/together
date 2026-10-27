@@ -75,6 +75,10 @@ link_directories(
 ##                                                                            ##
 ################################################################################
 
+add_library(together STATIC
+  ${TOGETHER_SOURCES}
+)
+
 add_executable(together-server
   ${TOGETHER_SOURCES}
   "src/together-server.c"
