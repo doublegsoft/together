@@ -188,6 +188,7 @@ tgr_task_worker(void* arg)
 {
   tgr_task_t* task = (tgr_task_t*)arg;
   tgr_frame_p resp = tgr_frame_init();
+  resp->magic = TGR_MAGIC;
   resp->version = TGR_VERSION;
   resp->message_type = TGR_MSG_RESP;
   resp->sequence_id = task->req->sequence_id;
