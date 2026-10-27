@@ -196,6 +196,8 @@ tgr_task_worker(void* arg)
   if (task->handler != NULL) {
     // 优先调用用户自定义的回调函数
     resp->error = task->handler(task->req, resp, task->user_data);
+    resp->payload_len = 0;
+    resp->payload = NULL;
   } else {
     // 默认行为：执行 Shell 任务
     printf("[Worker %lu] Started executing: %s\n", (unsigned long)pthread_self(), (char*)task->req->payload);
