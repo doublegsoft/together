@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#define _POSIX_C_SOURCE 199309L
 #include <time.h>
 #include <pthread.h>
 #include <stdatomic.h>
@@ -160,7 +161,7 @@ tgr_net_reply(socket_t client_fd, int seq, int error) {
   const char* msg = tgr_error_str(error);
   if (msg) {
     frame->payload_len = strlen(msg);
-    frame->payload = strdup(msg);
+    frame->payload = (uint8_t*) strdup(msg);
   }
 
   unsigned char* send_bytes = NULL;
@@ -203,13 +204,13 @@ tgr_task_worker(void* arg)
       size_t bytes_size = 0;
       if (tgr_file_read("output.log", &bytes, &bytes_size) == TGR_OK) {
         resp->payload_len = bytes_size;
-        resp->payload = bytes;
+        resp->payload = (uint8_t*) bytes;
       }
     } else {
       const char* msg = tgr_error_str(error);
       if (msg) {
         resp->payload_len = strlen(msg);
-        resp->payload = strdup(msg);
+        resp->payload = (uint8_t*) strdup(msg);
       }
     }
   }
