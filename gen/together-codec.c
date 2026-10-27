@@ -30,19 +30,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+  #include <winsock2.h>
+  #pragma comment(lib, "ws2_32.lib")
+#else
+  #include <arpa/inet.h>
+#endif
+
 #include "together-codec.h"
+#include "together-error.h"
 
 tgr_frame_p 
 tgr_frame_decode(const unsigned char* bytes, 
                  size_t* size)
 {
-  tgr_frame_p ret = tgr_frame_init();
   size_t offset = 0;
+  short magic = 0;
+  memcpy((void*)&magic, bytes, 2);
+  magic = ntohs(magic);
+  offset += 2;
+  if (magic != TGR_MAGIC) 
+    return NULL;
+  tgr_frame_p ret = tgr_frame_init();
   size_t block_bytes = 0;
 
-  // magic
-  memcpy((void*)&ret->magic, bytes + offset, 2);
-  offset += 2;
+  ret->magic = magic;
   // version
   memcpy((void*)&ret->version, bytes + offset, 1);
   offset += 1;
@@ -53,22 +65,24 @@ tgr_frame_decode(const unsigned char* bytes,
   memcpy((void*)ret->sender_host, bytes + offset, 16);
   offset += 16;
   // sender_port
-  memcpy((void*)&ret->sender_port, bytes + offset, 2);
+  uint16_t raw_sender_port = 0;
+  memcpy(&raw_sender_port, bytes + offset, 2);
+  ret->sender_port = ntohs(raw_sender_port);
   offset += 2;
   // sequence_id
   int raw_sequence_id = 0;
   memcpy(&raw_sequence_id, bytes + offset, 4);
-  ret->sequence_id = raw_sequence_id; // ntohl(raw_sequence_id);
+  ret->sequence_id = ntohl(raw_sequence_id);
   offset += 4;
   // error
   int raw_error = 0;
   memcpy(&raw_error, bytes + offset, 4);
-  ret->error = raw_error; // ntohl(raw_error);
+  ret->error = ntohl(raw_error);
   offset += 4;
   // payload_len
   int raw_payload_len = 0;
   memcpy(&raw_payload_len, bytes + offset, 4);
-  ret->payload_len = raw_payload_len; // ntohl(raw_payload_len);
+  ret->payload_len = ntohl(raw_payload_len);
   offset += 4;
   // payload
   ret->payload = (uint8_t*)malloc(ret->payload_len);  
@@ -90,7 +104,8 @@ tgr_frame_encode(const tgr_frame_p frame,
   tgr_frame_bytes(frame, &total_bytes);
   *bytes = (unsigned char*)malloc(total_bytes);
   // magic
-  memcpy((*bytes) + offset, &frame->magic, 2);
+  short raw_magic = htons(frame->magic);
+  memcpy((*bytes) + offset, &raw_magic, 2);   
   offset += 2;
   // version
   memcpy((*bytes) + offset, &frame->version, 1);
@@ -102,17 +117,21 @@ tgr_frame_encode(const tgr_frame_p frame,
   memcpy((*bytes) + offset, frame->sender_host, 16);
   offset += 16;
   // sender_port
-  memcpy((*bytes) + offset, &frame->sender_port, 2);
+  short raw_sender_port = htons(frame->sender_port);
+  memcpy((*bytes) + offset, &raw_sender_port, 2);   
   offset += 2;
   // sequence_id
-  memcpy((*bytes) + offset, &frame->sequence_id, 4);
-  offset += 4;
+  int raw_sequence_id = htonl(frame->sequence_id);
+  memcpy((*bytes) + offset, &raw_sequence_id, 4);  
+  offset += 4; 
   // error
-  memcpy((*bytes) + offset, &frame->error, 4);
-  offset += 4;
+  int raw_error = htonl(frame->error);
+  memcpy((*bytes) + offset, &raw_error, 4);  
+  offset += 4; 
   // payload_len
-  memcpy((*bytes) + offset, &frame->payload_len, 4);
-  offset += 4;
+  int raw_payload_len = htonl(frame->payload_len);
+  memcpy((*bytes) + offset, &raw_payload_len, 4);  
+  offset += 4; 
   // payload
   memcpy((*bytes) + offset, frame->payload, frame->payload_len);
   offset += frame->payload_len;
