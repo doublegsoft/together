@@ -227,7 +227,7 @@ tgr_task_worker(void* arg)
   tgr_frame_encode(resp, &send_bytes, &send_size);
 
   if (send_bytes && send_size > 0) {
-    send(task->client_fd, (const char*)send_bytes, (int)send_size, 0);
+    // send(task->client_fd, (const char*)send_bytes, (int)send_size, 0);
     free(send_bytes);
   }
 
